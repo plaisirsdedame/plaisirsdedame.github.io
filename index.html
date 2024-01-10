@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Plaisirs de Dame</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+            /* Light background color */
+        }
+
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        .banner {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 100px;
+
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100vh;
+            /* Full viewport height */
+            object-fit: cover;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            /* Add some space around the gallery */
+        }
+
+        .gallery-item {
+            flex: 0 0 calc(33.33% - 20px);
+            /* Adjust the width for different screen sizes */
+            margin: 10px;
+            /* Add space between gallery items */
+            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 300px;
+            /* Set a specific height */
+            position: relative;
+        }
+
+        /* Adjust the width for 4-6 items per row */
+        @media screen and (min-width: 768px) {
+            .gallery-item {
+                flex: 0 0 calc(33.33% - 20px);
+                /* 3 items per row */
+            }
+
+        }
+
+        @media screen and (min-width: 1024px) {
+            .gallery-item {
+                flex: 0 0 calc(25% - 20px);
+                /* 4 items per row */
+            }
+        }
+
+        .gallery-item:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .gallery-item:hover::after {
+            opacity: 1;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            margin: 10% auto;
+            max-width: 80%;
+            /* Make the modal responsive */
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            /* Add a subtle shadow */
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .close {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+            /* Ensure it's above the modal content */
+        }
+
+        /* Example 1: Centered Section with Image */
+        .section-center {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .section-center img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Example 2: Left-Aligned Section with Image */
+
+        .section-left {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+
+        }
+
+        .section-left img {
+            max-width: 40%;
+            /* Reduce the image width */
+            height: auto;
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+        .section-heel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            /* Adjust the shoe shape size */
+            height: auto;
+            /* Adjust the shoe shape size */
+            background-color: rgba(255, 255, 255, 0.7);
+            clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .section-heel:hover {
+            transform: translate(-50%, -50%) scale(1.4);
+            /* Scale up on hover */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            /* Add a box shadow on hover */
+        }
+
+        .map-heel {
+            width: 100%;
+            /* Make sure the iframe fits inside the shoe shape */
+            height: 100%;
+
+        }
+
+
+        .section-text {
+            max-width: 50%;
+            padding-left: 20px;
+            /* Add some padding to separate text and image */
+        }
+
+
+        /* Example 3: Right-Aligned Section with Image */
+        .section-right {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .section-right img {
+            max-width: 50%;
+            height: auto;
+            margin-left: auto;
+        }
+
+        /* Example 4: Section with Title Over Image (Left) */
+        .section-title-left {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .section-title-left img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+        .section-title-left .section-title {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            /* Increase the padding for a bigger tile */
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+
+
+
+        /* Example 5: Section with Title Over Image (Right) */
+        .section-title-right {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+
+        }
+
+        .section-title-right img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+        .section-title-right .section-title {
+            position: absolute;
+            top: 50%;
+            right: 10%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            /* Increase the padding for a bigger tile */
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+
+
+
+        /* Example 6: Section with Table Layout */
+        .section-table {
+            padding: 20px;
+        }
+
+        .section-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .section-table th,
+        .section-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        /* Add rounded corners to all images */
+        img {
+            border-radius: 10px;
+            /* Adjust the radius as needed */
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Add styles for contact links and logos */
+
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .contact-link:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        .contact-logo {
+            max-width: 20px;
+            height: auto;
+            margin-right: 5px;
+        }
+
+
+        h2 {
+            text-align: center;
+            /* Center the text */
+            background-color: #d6d6d6;
+            /* Light grey background color */
+            border-radius: 10px;
+            /* Rounded corners */
+            padding: 10px;
+            /* Add some padding */
+            max-width: fit-content;
+            /* Adjust the width as needed */
+            margin: 0 auto;
+            /* Center the container horizontally */
+        }
+
+
+        .section-center,
+        .section-left,
+        .section-title-left,
+        .section-title-right {
+            padding: 20px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section-left img,
+        .section-right img,
+        .section-title-left img,
+        .section-title-right img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            /* Add rounded corners */
+        }
+
+        .map-heel {
+            width: 100%;
+            /* Make sure the iframe fits inside the shoe shape */
+            height: 200px;
+            /* Adjust the height as needed */
+        }
+
+        .section-title-left .section-title,
+        .section-title-right .section-title {
+            font-size: 18px;
+            /* Adjust font size for mobile */
+            padding: 5px;
+            /* Adjust padding for mobile */
+            max-width: 90%;
+            /* Adjust max width for mobile */
+            margin: 10px auto;
+            /* Center for mobile */
+        }
+
+        /* Add responsive styles for contact links and logos */
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .contact-link:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        .contact-logo {
+            max-width: 20px;
+            height: auto;
+            margin-right: 5px;
+        }
+
+        .banner-mobile {
+
+
+            margin-bottom: 30px;
+
+        }
+
+
+        @media (max-width: 768px) {
+            .mobile_pouf {
+                display: none;
+            }
+
+            .section-title-right {
+
+                margin-top: 100px;
+
+            }
+
+            .gallery-item {
+                flex: 0 0 calc(50% - 20px);
+                /* 2 items per row on mobile */
+                height: 220px;
+                /* Fixed height for a more rectangular shape */
+            }
+
+            .banner-mobile {
+
+                margin-top: 50px;
+                margin-bottom: 200px;
+
+            }
+
+            .H2-mobile {
+
+                margin-top: 90px;
+
+
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="navbar">
+        <!-- Add navbar content here -->
+    </div>
+
+    <!-- HEADER! 
+    <div class="banner mobile_pouf">
+        <img src="IMAGES/banner01.gif" alt="Banner">
+    </div>-->
+
+
+
+
+
+    <!-- Example 2: BANIERE VIDEO -->
+    <div class="banner">
+        <div class="section-left">
+            <img src="IMAGES/banner02.gif" alt="Example Image">
+        </div>
+    </div>
+
+
+    <!-- DESCRIPTION BUSINESS VIDEO-->
+    <div class="section-title-right">
+        <img src="IMAGES/banner05.gif" alt="Example Image">
+    </div>
+
+
+
+    <br><br><br><br><br>
+    <!-- GOOGLE MAPS -->
+    <div class="banner banner-mobile">
+        <div class="map-heel">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1216.3939091176305!2d-74.59778506423864!3d46.11819662906081!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4ccf751d3a88679d%3A0xe977668d5019131f!2sBoutique%20Plaisirs%20De%20Dame%20Inc!5e0!3m2!1sen!2sca!4v1704830146496!5m2!1sen!2sca"
+                width="400" height="400" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+    <br><br><br><br><br>
+
+
+    <!-- BUSINESS INFORMATIONS -->
+    <div class="section-title-left">
+        <img src="IMAGES/banner03.gif" alt="Example Image" class="mobile_pouf">
+
+        <div class="section-title">
+            <div class="contact-links">
+                <a href="tel:8194296101" class="contact-link">
+                    <img src="IMAGES/contact1.png" alt="Contact 1" class="contact-logo">
+                    &nbsp;(819) 429-6101
+                </a>
+                <a href="https://maps.app.goo.gl/3rnqQBgxHowX9FRk7" class="contact-link">
+                    <img src="IMAGES/contact2.png" alt="Contact 2" class="contact-logo">
+                    &nbsp;969 Rue St-Jovite: Bureau 101
+                </a>
+                <a href="mailto:plaisirdedame44@gmail.com" class="contact-link">
+                    <img src="IMAGES/contact3.png" alt="Contact 3" class="contact-logo">
+                    &nbsp;plaisirdedame44@gmail.com
+                </a>
+                <a href="https://g.co/kgs/TMhG6yE" class="contact-link">
+                    <img src="IMAGES/contact4.png" alt="Contact 4" class="contact-logo">
+                    &nbsp;Lundi-Samedi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10:00-17:00
+                </a>
+                <a href="https://wbecanada.ca/fr/" class="contact-link">
+                    <img src="IMAGES/contact5.png" alt="Contact 5" class="contact-logo">
+                    Entreprise détenue par des femmes
+                </a>
+                <a href="https://www.facebook.com/boutiqueplaisirsdedame" class="contact-link">
+                    <img src="IMAGES/contact6.png" alt="Contact 6" class="contact-logo">
+                    Venez nous suivre sur Facebook!
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+    <!-- Example 6: Section with Table Layout
+    <div class="section-table">
+        <table>
+            <tr>
+                <th>Column 1</th>
+                <th>Column 2</th>
+                <th>Column 3</th>
+            </tr>
+            <tr>
+                <td>Data 1</td>
+                <td>Data 2</td>
+                <td>Data 3</td>
+            </tr>
+        </table>
+    </div>
+-->
+
+
+    <!-- GALLERY -->
+    <br><br><br><br>
+    <h2 class="H2-mobile">Nous proposons une variété exceptionnelle pour votre prochain magasinage!</h2>
+    <div class="gallery">
+        <div class="gallery-item" onclick="openModal('Alison Sheri')">
+            <img src="IMAGE/Alison Sheri/img03.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img02.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img05.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img09.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img08.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img04.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img07.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img06.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img010.jpeg" alt="Alison Sheri" class="responsive-img">
+            <img src="IMAGE/Alison Sheri/img01.jpeg" alt="Alison Sheri" class="responsive-img">
+        </div>
+        <div class="gallery-item" onclick="openModal('Renuar')">
+            <img src="IMAGE/Renuar/img03.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img02.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img05.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img04.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img07.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img06.jpeg" alt="Renuar" class="responsive-img">
+            <img src="IMAGE/Renuar/img01.jpeg" alt="Renuar" class="responsive-img">
+        </div>
+        <div class="gallery-item" onclick="openModal('Micheal Tyler')">
+            <img src="IMAGE/Micheal Tyler/img03.jpeg" alt="Micheal Tyler" class="responsive-img">
+            <img src="IMAGE/Micheal Tyler/img02.jpeg" alt="Micheal Tyler" class="responsive-img">
+            <img src="IMAGE/Micheal Tyler/img05.jpeg" alt="Micheal Tyler" class="responsive-img">
+            <img src="IMAGE/Micheal Tyler/img04.jpeg" alt="Micheal Tyler" class="responsive-img">
+            <img src="IMAGE/Micheal Tyler/img06.jpeg" alt="Micheal Tyler" class="responsive-img">
+            <img src="IMAGE/Micheal Tyler/img01.jpeg" alt="Micheal Tyler" class="responsive-img">
+        </div>
+        <div class="gallery-item" onclick="openModal('FDJ')">
+            <img src="IMAGE/FDJ/img03.jpeg" alt="FDJ" class="responsive-img">
+            <img src="IMAGE/FDJ/img02.jpeg" alt="FDJ" class="responsive-img">
+            <img src="IMAGE/FDJ/img05.jpeg" alt="FDJ" class="responsive-img">
+            <img src="IMAGE/FDJ/img04.jpeg" alt="FDJ" class="responsive-img">
+            <img src="IMAGE/FDJ/img06.jpeg" alt="FDJ" class="responsive-img">
+            <img src="IMAGE/FDJ/img01.jpeg" alt="FDJ" class="responsive-img">
+        </div>
+        <div class="gallery-item" onclick="openModal('Zilch')">
+            <img src="IMAGE/Zilch/img02.jpeg" alt="Zilch" class="responsive-img">
+            <img src="IMAGE/Zilch/img01.jpeg" alt="Zilch" class="responsive-img">
+        </div>
+    </div>
+    <!-- Modal Structure -->
+    <div id="modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content" id="modal-content">
+            <!-- Images will be injected here -->
+        </div>
+    </div>
+
+
+    <br><br><br><br>
+    <!-- PHOTO BOUTIQUE -->
+    <div class="section-title-right">
+        <img src="IMAGES/banner04.png" alt="Example Image">
+        <div class="section-title">
+            <a href="https://maps.app.goo.gl/3rnqQBgxHowX9FRk7" class="contact-link">
+                <img src="IMAGES/contact2.png" alt="Contact 2" class="contact-logo">
+                &nbsp;Visitez notre boutique!
+            </a>
+        </div>
+    </div>
+
+
+
+    <script>
+        function openModal(company) {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'block';
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = ''; // Clear existing content
+
+            let i = 1;
+            let imageExists = true;
+
+            // Load images until an image with a specific name does not exist
+            while (imageExists) {
+                const img = document.createElement('img');
+                const imgSrc = `IMAGE/${company}/img0${i}.jpeg`;
+
+                // Check if the image exists
+                imageExists = imageExistsCheck(imgSrc);
+
+                if (imageExists) {
+                    img.src = imgSrc;
+                    img.alt = `${company} Image ${i}`;
+                    img.classList.add('responsive-img');
+                    modalContent.appendChild(img);
+                }
+
+                i++;
+            }
+
+            // Add event listener to close modal on double click
+            modal.addEventListener('dblclick', closeModal);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+
+            // Remove the event listener to prevent multiple listeners
+            modal.removeEventListener('dblclick', closeModal);
+        }
+
+        // Function to check if an image exists
+        function imageExistsCheck(url) {
+            const img = new Image();
+            img.src = url;
+            return img.width > 0 && img.height > 0;
+        }
+    </script>
+
+
+
+</body>
+
+</html>
